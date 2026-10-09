@@ -46,7 +46,7 @@ const courses = {
 
 
 /**
- * Declare Important Variables
+ * DECLARE IMPORTANT VARIABLES
  */
 // Define the port number the server will listen on
 const NODE_ENV = process.env.NODE_ENV || 'production';
@@ -57,19 +57,32 @@ const __dirname = path.dirname(__filename);
 
 
 /**
- * Setup Express Server
+ * SETUP EXPRESS SERVER
  */
 // Create an instance of an Express application
 const app = express();
 
+/**
+ * GLOBAL TIMESTAMP MIDDLEWARE
+ * stores the current timestamp in res.locals for each request.
+ */
+
 app.use((req, res, next) => {
-    console.log('REQUEST:', req.method, req.url);
+    res.locals.timestamp = new Date().toISOString();
     next();
 });
 
+/** GLOBAL REQUEST LOGGING MIDDLEWARE */
+
+app.use((req, res, next) => {
+    // Skip logging for routes that start with /. (like /.well-known/)
+    if (!req.path.startsWith('/.')) {
+    }
+    next(); // Pass control to the next middleware or route
+});
 
 /**
- * Configure Express middleware
+ * CONFUGURE EXPRESS MIDDEWARE
  */
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -81,7 +94,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src/views'));
 
 /**
- * Global template variables middleware
+ * GLOBAL TEMPLATE VARIABLES MIDDLEWARE
  * 
  * Makes common variables available to all EJS templates without having to pass
  * them individually from each route handler
@@ -94,8 +107,73 @@ app.use((req, res, next) => {
     next();
 });
 
+// Route-specific middleware function
+const addVisitCount = (req, res, next) => {
+    res.locals.visitCount = 42;
+    next();
+};
+
+// Middleware to add global data to all templates
+app.use((req, res, next) => {
+    // Add current year for copyright
+    res.locals.currentYear = new Date().getFullYear();
+
+    next();
+});
+
+// Global middleware for time-based greeting
+app.use((req, res, next) => {
+    const currentMonth = new Date().getMonth();
+    if (currentMonth >= 8 && currentMonth <= 10) {
+        res.locals.seasonalGreeting = 'Happy Fall';
+    } else {
+        res.locals.seasonalGreeting = 'Hello!';
+    }
+    const currentHour = new Date().getHours();
+
+    /**
+     * Create logic to set different greetings based on the current hour.
+     * Use res.locals.greeting to store the greeting message.
+     * Hint: morning (before 12), afternoon (12-17), evening (after 17)
+     */
+    if (currentHour < 12) {
+        res.locals.greeting = '<p>Good morning!</p>';
+    } else if (currentHour < 17) {
+        res.locals.greeting = '<p>Good afternoon!</p>';
+    } else {
+        res.locals.greeting = '<p>Good evening!</p>'
+    }    
+    next();
+});
+
+// Global middleware for random theme selection
+app.use((req, res, next) => {
+    const themes = ['blue-theme', 'green-theme', 'red-theme', 'purple-theme', 'orange-theme'];
+
+    // Your task: Pick a random theme from the array
+    const randomTheme = themes[Math.floor(Math.random() * themes.length)];
+    res.locals.bodyClass = randomTheme;
+
+    next();
+});
+
+// Global middleware to share query parameters with templates
+app.use((req, res, next) => {
+    // Make req.query available to all templates for debugging and conditional rendering
+    res.locals.queryParams = req.query || {};
+
+    next();
+});
+
+// Route-specific middleware that sets custom headers
+const addDemoHeaders = (req, res, next) => {
+    res.setHeader('X-Demo-Page', 'true');
+    res.setHeader('X-Middleware-Demo', 'Here is my demo page');
+
+    next();
+};
 /**
- * Routes
+ * ROUTES
  */
 app.get('/', (req, res) => {
     const title = 'Welcome Home';
@@ -124,9 +202,6 @@ app.get('/student', (req, res) => {
     });
 });
 
-
-
-
 // Course catalog list page
 app.get('/catalog', (req, res) => {
     res.render('catalog', {
@@ -134,6 +209,23 @@ app.get('/catalog', (req, res) => {
         courses: courses
     });
 });
+
+app.get('/welcome', addVisitCount, (req, res) => {
+    res.send(`The current timestamp is ${res.locals.timestamp}<br> The current visit count is  ${res.locals.visitCount}`);
+});
+
+let demoRequestCount = 0
+
+// Demo page route with header middleware
+app.get('/demo', addDemoHeaders, (req, res) => {
+    demoRequestCount++;
+    res.render('demo', {
+        title: 'Middleware Demo Page',
+        demoRequestCount: demoRequestCount
+    });
+});
+
+/** DYNAMIC ROUTE WITH PARAMETERS AND QUERY HANDLING */
 
 // Enhanced course detail route with sorting
 app.get('/catalog/:courseId', (req, res, next) => {
@@ -175,6 +267,8 @@ app.get('/catalog/:courseId', (req, res, next) => {
     });
 });
 
+/** ERROR-HANDLING TEST ROUTES */
+
 // Test route for 500 errors
 app.get('/test-error', (req, res, next) => {
     const err = new Error('This is a test error');
@@ -197,14 +291,15 @@ app.get('/test-bad-request', (req, res, next) => {
 
 });
 
-// Catch-all route for 404 errors
+// CARCH-ALL ROUTE FOR 404 ERRORS
 app.use((req, res, next) => {
     const err = new Error('Page Not Found');
     err.status = 404;
     next(err);
 });
 
-// Global error handler
+// GLOBAL ERROR HANDLER
+
 app.use((err, req, res, next) => {
     // Prevent infinite loops, if a response has already been sent, do nothing
     if (res.headersSent || res.finished) {
@@ -234,6 +329,8 @@ app.use((err, req, res, next) => {
     }
 });
 
+//** DEVELOPMENT WEBSOCKET SERVER */
+
 // When in development mode, start a WebSocket server for live reloading
 if (NODE_ENV.includes('dev')) {
     const ws = await import('ws');
@@ -254,6 +351,7 @@ if (NODE_ENV.includes('dev')) {
     }
 }
 
+/** START SERVER */
 
 // Start the server and listen on the specified port
 app.listen(PORT, () => {
