@@ -16,7 +16,7 @@ router.get('/about', aboutPage);
 
 // Course catalog routes
 router.get('/catalog', catalogPage);
-router.get('/catalog/:courseId', courseDetailPage);
+router.get('/catalog/:courseSlugId', courseDetailPage);
 
 // Faculty directory routes
 router.get('/faculty', facultyListPage);
