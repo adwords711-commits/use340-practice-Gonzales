@@ -96,6 +96,9 @@ const getCoursesByFaculty = async (identifier, identifierType = 'slug', sortBy =
     `;
     
     const result = await db.query(query, [identifier]);
+    console.log('Course identifier:', identifier);
+    console.log('Sections returned:', result.rows.length);
+    console.log('Section data:', result.rows);
     
     return result.rows.map(section => ({
         id: section.id,

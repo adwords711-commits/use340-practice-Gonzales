@@ -16,7 +16,7 @@ const facultyListPage = async (req, res) => {
 // Route Handler for faculty detailed page
 const facultyDetailPage = async (req, res, next) => {
     const facultyId = req.params.facultyId;
-    const facultyMember = await getFacultyById(facultyId);
+    const facultyMember = await getFacultyBySlug(facultyId);
     
     // if faculty does not exist, a 404 page not found
     if (Object.keys(facultyMember).length === 0) {
@@ -32,3 +32,4 @@ const facultyDetailPage = async (req, res, next) => {
 }
 
 export {facultyListPage, facultyDetailPage};
+

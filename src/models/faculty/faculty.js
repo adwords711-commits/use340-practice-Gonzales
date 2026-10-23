@@ -52,7 +52,7 @@ const getFaculty = async (identifier, identifierType = 'id') => {
  * @param {string} sortBy - Sort option: 'department' (default), 'name', 'title'
  * @returns {Promise<Array>} Array of faculty objects sorted by the specified field
  */
-const getSortedFaculty = async (sortBy = 'department') => {
+const getSortedFaculty = async (sortBy = 'name') => {
     /**
      * Build ORDER BY clause - notice we sort by last_name, then first_name for names.
      * This is the standard way to alphabetize people's names.
