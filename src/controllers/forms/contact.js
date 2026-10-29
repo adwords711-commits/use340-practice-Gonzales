@@ -30,11 +30,11 @@ const handleContactSubmission = async (req, res) => {
     }
 
     // Extract validated data
-    const { subject, message } = req.body;
+    const { name, email, subject, message } = req.body;
 
     try {
         // Save to database
-        await createContactForm(subject, message);
+        await createContactForm(name, email, subject, message);
         console.log('Contact form submitted successfully');
         // Redirect to responses page on success
         res.redirect('/contact/responses');
@@ -72,6 +72,16 @@ router.get('/', showContactForm);
  */
 router.post('/',
     [
+        body('name')
+        .trim()
+        .isLength({ min: 2 })
+        .withMessage('name must be at least 2 characters'),
+        
+        body('email')
+        .trim()
+        .isLength({ min: 2 })
+        .withMessage('email must be at least 2 characters'),
+
         body('subject')
             .trim()
             .isLength({ min: 2 })

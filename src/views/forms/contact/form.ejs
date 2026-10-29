@@ -7,6 +7,20 @@
 
     <form method="POST" action="/contact" class="contact-form">
         <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" 
+                    placeholder="Your name?" 
+                    minlength="2" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="text" id="email" name="email" 
+                    placeholder="Enter your email?" 
+                    minlength="2" required>
+        </div>
+        
+        <div class="form-group">
             <label for="subject">Subject</label>
             <input type="text" id="subject" name="subject" 
                     placeholder="What is this message about?" 

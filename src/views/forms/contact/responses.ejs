@@ -6,8 +6,10 @@
         <div class="contact-responses">
             <% contactForms.forEach(form => { %>
                 <div class="response-item">
-                    <h3 class="response-subject"><%= form.subject %></h3>
-                    <p class="response-message"><%= form.message %></p>
+                    <p class="response-name">Name: <%= form.name %></p>
+                    <p class="response-email">Email: <%= form.email %></p>
+                    <h3 class="response-subject">Subject: <%= form.subject %></h3>
+                    <p class="response-message">Message: <%= form.message %></p>
                     <p class="response-date">Submitted: <%= new Date(form.submitted).toLocaleDateString() %></p>
                 </div>
             <% }); %>
