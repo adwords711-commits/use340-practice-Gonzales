@@ -1,5 +1,5 @@
 import { getFacultyById, getFacultyBySlug, getSortedFaculty }from '../../models/faculty/faculty.js';
-import pool from '../../config/db.js';
+//import pool from '../../config/db.js';
 
 // Route handler for the faculty list page
 const facultyListPage = async (req, res) => {
