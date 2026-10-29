@@ -15,7 +15,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --env-file=.env server.js",
-    "start": "node  --env-file=.env server.js"
+    "start": "node server.js",
+    "restore": "node restore.js"
   },
   "keywords": [],
   "author": "",
