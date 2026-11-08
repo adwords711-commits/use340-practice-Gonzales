@@ -38,10 +38,11 @@ const processLogin = async (req, res) => {
 
     if (!errors.isEmpty()) {
         // TODO: Log validation errors to console
-        console.error(errors.array());
+        errors.array().forEach(error => {
+            req.flash('error', error.msg);
+        });
         // TODO: Redirect back to /login
-        res.redirect('/login');
-        return;
+        return res.redirect('/login');
     }
 
     // TODO: Extract email and password from req.body
@@ -52,14 +53,14 @@ const processLogin = async (req, res) => {
         const user = await findUserByEmail(email);
         // TODO: If not found, log "User not found" and redirect to /login
         if (!user) {
-            console.error('User not found');
+            req.flash('error', 'Invalid email or password');
             return res.redirect('/login');
         }
         // TODO: Verify password using verifyPassword(password, user.password)
         const isValid = await verifyPassword(password, user.password);
         // TODO: If password incorrect, log "Invalid password" and redirect to /login
         if (!isValid) {
-            console.error('Password is incorrect');
+            req.flash('error', 'Invalid email or password');
             return res.redirect('/login');
         }
         // SECURITY: Remove password from user object before storing in session
@@ -73,6 +74,8 @@ const processLogin = async (req, res) => {
             created_at: user.created_at
         };
         req.session.user = sessionUser;
+
+        req.flash('success', `Welcome back, ${user.name}!`);
         // TODO: Redirect to /dashboard
         return res.redirect('/dashboard');
 
@@ -80,6 +83,8 @@ const processLogin = async (req, res) => {
         // Model functions do not catch errors, so handle them here
         // TODO: Log error to console
         console.error('Log in failed', error);
+
+        req.flash('error', 'Unable to log in. Please try again later.');
         // TODO: Redirect to /login
         return res.redirect('/login');
     }
