@@ -4,42 +4,36 @@
 
     <!-- TODO: Check if users array exists and has content using: if (users && users.length > 0) -->
     <% if (users && users.length > 0) { %>
-
         <div class="users-list">
-            <!-- TODO: Loop through users array with forEach -->
-            <!-- For each user in the loop, create this structure: -->
-            <% users.forEach(user => { %> 
-
+            <% users.forEach(listUser => { %>
+                <% 
+                    // Calculate permissions for this user card
+                    // 'user' variable contains the current logged-in user (from session)
+                    // 'listUser' is the user from the users array we're currently rendering
+                    const currentUser = typeof isLoggedIn !== 'undefined' && isLoggedIn ? user : null;
+                    const canEdit = currentUser && (currentUser.id === listUser.id || currentUser.roleName === 'admin');
+                    const canDelete = currentUser && currentUser.roleName === 'admin' && currentUser.id !== listUser.id;
+                %>
                 <div class="user-card">
-                    <div class="user-header">
-                        <!-- TODO: Add h3 with user's name -->
-                        <h3><%= user.name %></h3>
-                        <!-- TODO: Add span with class="user-id" showing: ID: user.id -->
-                         <span class="user-id">ID: <%= user.id %></span>
-                    </div>
+                    <h3><%= listUser.name %></h3>
+                    <p><%= listUser.email %></p>
 
-                    <div class="user-details">
-                        <div class="detail-item">
-                            <!-- TODO: Add div with class="label" containing: Email -->
-                             <div class="label">Email</div>
-                            <!-- TODO: Add div with class="value" containing: user.email -->
-                             <div class="value"><%= user.email %></div>
-                        </div>
+                    <% if (canEdit || canDelete) { %>
+                        <div class="user-actions">
+                            <% if (canEdit) { %>
+                                <a href="/register/<%= listUser.id %>/edit">Edit</a>
+                            <% } %>
 
-                        <div class="detail-item">
-                            <!-- TODO: Add div with class="label" containing: Registered -->
-                             <div class="label">Registered</div>
-                            <!-- TODO: Add div with class="value" containing formatted date -->
-                            <!-- HINT: Use new Date(user.created_at).toLocaleDateString() -->
-                             <div class="value"><%= new Date(user.created_at).toLocaleDateString() %></div>
+                            <% if (canDelete) { %>
+                                <form method="POST" action="/register/<%= listUser.id %>/delete" style="display: inline;">
+                                    <button type="submit" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
+                                </form>
+                            <% } %>
                         </div>
-                    </div>
+                    <% } %>
                 </div>
-
-            <!-- TODO: End the forEach loop -->
-             <% }); %>
+            <% }); %>
         </div>
-
     <!-- TODO: Add else clause -->
      <% } else { %>
         <!-- TODO: Add paragraph with class="no-users" -->

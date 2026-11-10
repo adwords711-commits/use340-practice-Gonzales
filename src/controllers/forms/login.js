@@ -12,11 +12,15 @@ const loginValidation = [
         .trim()
         .isEmail()
         .withMessage('Please provide a valid email address')
-        .normalizeEmail(),
+        .normalizeEmail()
+        .isLength({ max: 255 })
+        .withMessage( 'Email address is too long'),
 
     body('password')
-        .isLength({ min: 8 })
+        .notEmpty()
         .withMessage('Password is required')
+        .isLength({ min: 8, max: 128 })
+        .withMessage('Password must be between 8 and 128 characters')
 ];
 
 /**
@@ -71,6 +75,7 @@ const processLogin = async (req, res) => {
             id: user.id,
             name: user.name,
             email: user.email,
+            roleName: user.roleName,
             created_at: user.created_at
         };
         req.session.user = sessionUser;
